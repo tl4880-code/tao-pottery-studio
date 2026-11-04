@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f0e9">
+  <meta name="description" content="A simple pottery studio. Shape clay, choose a glaze, and share your piece.">
+  <title>TAO — Pottery studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%238c4938'/%3E%3Ctext x='24' y='34' text-anchor='middle' fill='%23f2f0e9' font-size='32' font-family='serif'%3E陶%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="/" aria-label="TAO home"><span class="seal">陶</span><span>TAO<span class="brand-note">A DIGITAL ATELIER</span></span></a>
+    <nav aria-label="Main navigation">
+      <button class="nav-active" id="studio-nav">Studio</button>
+      <button id="gallery-nav">Gallery <i id="collection-count">0</i></button>
+    </nav>
+  </header>
+
+  <main id="studio">
+    <div id="scene" role="application" aria-label="Pottery wheel. Drag the clay to shape it, or use the keyboard controls below." tabindex="0"></div>
+    <section class="intro">
+      <h1>Shape<br>something.</h1>
+      <p class="intro-copy">Drag the clay. Make it your own.</p>
+    </section>
+    <aside class="process" aria-label="Your progress">
+      <button class="step active" data-stage="shape" aria-current="step"><span class="step-number">01</span><span>Shape</span><i></i></button>
+      <span class="step-line"></span>
+      <button class="step" data-stage="glaze"><span class="step-number">02</span><span>Glaze</span><i></i></button>
+      <span class="step-line"></span>
+      <button class="step" data-stage="fire" disabled><span class="step-number">03</span><span>Fire</span><i></i></button>
+    </aside>
+    <div class="object-label"><span id="material-label">Raw clay</span><span id="object-caption">On the wheel</span></div>
+    <div class="gesture-hint" id="gesture-hint">↔ Drag inward or outward to shape</div>
+    <div class="firing-veil" id="firing-veil" hidden>
+      <p id="firing-caption">Firing your piece…</p>
+      <div class="kiln-track"><span id="kiln-progress"></span></div>
+    </div>
+
+    <section class="control-dock" aria-label="Pottery controls">
+      <div class="dock-section height-section" id="height-controls">
+        <label class="control-label" for="height">Height <output id="height-value">24 cm</output></label>
+        <input id="height" type="range" min="1.8" max="3.8" step="0.05" value="2.65" aria-label="Pot height">
+      </div>
+      <div class="dock-section glaze-section" id="glaze-controls" hidden>
+        <span class="control-label">Glaze <span id="glaze-name">Celadon</span></span>
+        <div class="swatches">
+          <button data-glaze="celadon" class="swatch selected" style="--swatch:#a5b9aa" aria-label="Celadon" aria-pressed="true"></button>
+          <button data-glaze="ivory" class="swatch" style="--swatch:#e4ddcb" aria-label="Ivory" aria-pressed="false"></button>
+          <button data-glaze="ink" class="swatch" style="--swatch:#444943" aria-label="Ink" aria-pressed="false"></button>
+        </div>
+      </div>
+      <div class="dock-section finish-section" id="finish-controls" hidden><p>Your piece is ready.</p></div>
+      <div class="dock-actions">
+        <button id="reset" class="text-button">Start over</button>
+        <button class="primary-button" id="next-stage"><span>Choose glaze</span><span>→</span></button>
+      </div>
+    </section>
+    <footer class="studio-footer">
+      <span class="studio-status"><i></i><span id="status-text">Take your time.</span></span>
+      <button id="keyboard-toggle" class="quiet-link" aria-expanded="false" aria-controls="keyboard-panel">Keyboard controls</button>
+    </footer>
+    <section class="keyboard-panel" id="keyboard-panel" hidden aria-label="Keyboard shaping controls">
+      <div><label for="level">Position <output id="level-value">Middle</output></label><input id="level" type="range" min="2" max="47" value="25"></div>
+      <div><label for="radius">Width at this position</label><input id="radius" type="range" min="0.35" max="1.55" step="0.01" value="0.88"></div>
+      <p>Use arrow keys to adjust the sliders.</p>
+    </section>
+  </main>
+
+  <dialog id="save-dialog" class="save-dialog">
+    <button class="close-dialog" data-close="save-dialog" aria-label="Close">×</button>
+    <h2>Name your piece.</h2>
+    <p class="dialog-copy">Add it to the gallery for others to see.</p>
+    <form id="save-form">
+      <label for="pot-name">Piece name</label>
+      <input id="pot-name" name="name" maxlength="40" placeholder="e.g. Morning cup" required autocomplete="off">
+      <label for="pot-author">Your name <span>optional</span></label>
+      <input id="pot-author" name="author" maxlength="30" placeholder="Anonymous" autocomplete="nickname">
+      <p id="save-error" class="form-error" role="alert"></p>
+      <button type="submit" class="primary-button" id="save-submit"><span>Save to gallery</span><span>↗</span></button>
+    </form>
+  </dialog>
+  <dialog id="reset-dialog" class="small-dialog">
+    <h2>Start again?</h2>
+    <p>Your unsaved changes will be lost.</p>
+    <div class="dialog-actions"><button class="text-button" data-close="reset-dialog">Keep working</button><button class="primary-button" id="confirm-reset">Start over ↗</button></div>
+  </dialog>
+  <dialog id="gallery-dialog" class="gallery-dialog">
+    <div class="gallery-header"><h2>The gallery</h2><button class="close-dialog" data-close="gallery-dialog" aria-label="Close gallery">×</button></div>
+    <div class="gallery-subtitle"><p>Pieces made by everyone.</p><button id="refresh-gallery" class="quiet-link">Refresh ↻</button></div>
+    <div id="gallery-grid" class="gallery-grid" aria-live="polite"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <noscript><p class="no-script">Please enable JavaScript to use the pottery studio.</p></noscript>
+</body>
+</html>
