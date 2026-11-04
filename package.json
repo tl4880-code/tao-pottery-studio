@@ -1,0 +1,10 @@
+{
+  "name": "tao-digital-atelier",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A quiet, interactive pottery studio with a shared persistent collection.",
+  "scripts": { "start": "node server.js", "dev": "node --watch server.js", "test": "node --test" },
+  "engines": { "node": ">=20" },
+  "dependencies": { "express": "^5.1.0", "lowdb": "^7.0.1", "three": "^0.181.0" }
+}
